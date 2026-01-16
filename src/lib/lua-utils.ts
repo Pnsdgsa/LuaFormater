@@ -15,13 +15,17 @@ export function deleteAllComments(code: string): string {
 
 /**
  * Converts multi-line Lua code into a single line.
- * It removes all comments and extra whitespace.
+ * It converts single-line comments to block comments to preserve them.
  * @param code The input Lua code.
  * @returns Single-line code string.
  */
 export function toOneLiner(code: string): string {
-  // First, remove all comments.
-  let oneLiner = deleteAllComments(code);
+  // Convert single-line comments to block comments to preserve them.
+  // This is necessary because a single-line comment would comment out the rest of the code.
+  let oneLiner = code.replace(/--[ \t]*(?!\[(?:=|\[)?)(.*)/g, (match, content) => {
+      const trimmed = content.trim();
+      return trimmed ? ` --[[ ${trimmed} ]] ` : '';
+  });
   // Replace newlines and tabs with a space, then collapse multiple spaces.
   oneLiner = oneLiner.replace(/[\r\n\t]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
   return oneLiner;
@@ -31,19 +35,13 @@ export function toOneLiner(code: string): string {
  * A basic Lua code beautifier.
  * NOTE: This is a simple formatter based on keywords and may not handle all complex Lua syntax correctly.
  * @param code The input Lua code.
- * @param commentOption How to handle comments: 'delete' or 'convert' single-line to block comments.
+ * @param commentOption How to handle comments: 'delete' or 'preserve'.
  * @returns Formatted code string.
  */
-export function beautifyCode(code: string, commentOption: 'delete' | 'convert'): string {
+export function beautifyCode(code: string, commentOption: 'delete' | 'preserve'): string {
   let currentCode = code;
   if (commentOption === 'delete') {
     currentCode = deleteAllComments(code);
-  } else if (commentOption === 'convert') {
-    // Convert single-line comments to block comments (--[[...]])
-    currentCode = currentCode.replace(/--[ \t]*(?!\[(?:=|\[)?)(.*)/g, (match, content) => {
-        const trimmed = content.trim();
-        return trimmed ? `--[[ ${trimmed} ]]` : '';
-    });
   }
 
   const lines = currentCode.split('\n');

@@ -69,7 +69,7 @@ export function LuaEditor() {
     toast({ title: 'Download started!', description: 'Your .lua file is being downloaded.' });
   };
 
-  const handleBeautify = (commentOption: 'delete' | 'convert') => {
+  const handleBeautify = (commentOption: 'delete' | 'preserve') => {
     try {
       const result = lua.beautifyCode(inputCode, commentOption);
       setOutputCode(result);
@@ -153,13 +153,13 @@ export function LuaEditor() {
           <AlertDialogHeader>
             <AlertDialogTitle>Beautify Options</AlertDialogTitle>
             <AlertDialogDescription>
-              How should comments be handled during beautification? Choose to remove them or convert single-line comments to block comments (`--[[...]]`) to preserve them.
+              How should comments be handled during beautification? You can choose to either remove all comments or preserve them as they are.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={() => handleBeautify('delete')} className="bg-destructive hover:bg-destructive/90">Delete comments</AlertDialogAction>
-            <AlertDialogAction onClick={() => handleBeautify('convert')} className="bg-accent hover:bg-accent/90">Convert & Preserve</AlertDialogAction>
+            <AlertDialogAction onClick={() => handleBeautify('preserve')} className="bg-accent hover:bg-accent/90">Preserve Comments</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
