@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeftRight, Copy, Download, Trash2, Sparkles, Brush } from 'lucide-react';
+import { ArrowLeftRight, Copy, Download, Trash2, Sparkles, Brush, Trash } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -113,6 +113,12 @@ export function LuaEditor() {
     }
   };
 
+  const handleClear = () => {
+    setInputCode('');
+    setOutputCode('');
+    toast({ title: 'Cleared!', description: 'Input and output fields have been cleared.' });
+  }
+
   return (
     <>
       <Card className="w-full shadow-lg">
@@ -157,6 +163,9 @@ export function LuaEditor() {
             </Button>
             <Button variant="secondary" onClick={handleDownload} disabled={!outputCode}>
               <Download className="mr-2 h-4 w-4" /> Download
+            </Button>
+            <Button variant="destructive" onClick={handleClear}>
+              <Trash className="mr-2 h-4 w-4" /> Clear
             </Button>
           </div>
         </CardContent>
