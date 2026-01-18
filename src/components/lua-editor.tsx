@@ -74,8 +74,39 @@ export function LuaEditor() {
       toast({ title: 'Nothing to copy!', description: 'Please process some code first.', variant: 'destructive' });
       return;
     }
-    navigator.clipboard.writeText(outputCode);
-    toast({ title: 'Copied to clipboard!', description: 'The output code has been copied.' });
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(outputCode)
+        .then(() => {
+          toast({ title: 'Copied to clipboard!', description: 'The output code has been copied.' });
+        })
+        .catch(err => {
+          console.error('Failed to copy: ', err);
+          toast({ title: 'Failed to copy!', description: 'Could not copy text to clipboard.', variant: 'destructive' });
+        });
+    } else {
+      // Fallback for insecure contexts
+      const textArea = document.createElement("textarea");
+      textArea.value = outputCode;
+      
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      document.body.appendChild(textArea);
+      
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        document.execCommand('copy');
+        toast({ title: 'Copied to clipboard!', description: 'The output code has been copied.' });
+      } catch (err) {
+        console.error('Fallback failed to copy: ', err);
+        toast({ title: 'Failed to copy!', description: 'Could not copy text to clipboard.', variant: 'destructive' });
+      } finally {
+        document.body.removeChild(textArea);
+      }
+    }
   };
   
   const handleDownload = () => {

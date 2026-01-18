@@ -1,6 +1,4 @@
 
-import { parse } from 'full-moon';
-
 /**
  * Removes all single-line and multi-line comments from Lua code.
  * @param code The input Lua code string.
@@ -71,8 +69,29 @@ export function reverseCode(code: string): string {
  */
 export function beautifyCode(code: string): string {
   try {
-    const ast = parse(code);
-    return JSON.stringify(ast, null, 2);
+    // This is a very basic beautifier.
+    let indentLevel = 0;
+    const indentChar = '  ';
+    const lines = code.replace(/;/g, ';\n').replace(/\b(then|do)\b/g, '$1\n').replace(/\b(end|else|elseif|until)\b/g, '\n$1').split('\n');
+    let formatted = '';
+    
+    for (let line of lines) {
+      line = line.trim();
+      if (line.match(/^(end|else|elseif|until)\b/)) {
+        indentLevel = Math.max(0, indentLevel - 1);
+      }
+      if (line !== '') {
+        formatted += indentChar.repeat(indentLevel) + line + '\n';
+      }
+      if (line.match(/\b(function|if|while|for|repeat|do)\b/)) {
+        // Avoid double indenting on one-line blocks
+        if (!line.match(/\b(end)\b/)) {
+          indentLevel++;
+        }
+      }
+    }
+    return formatted.replace(/\n\s*\n/g, '\n').trim();
+
   } catch (e) {
     console.error('Error beautifying code:', e);
     return code;
