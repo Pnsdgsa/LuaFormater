@@ -41,7 +41,33 @@ export function LuaEditor() {
   const [inputCode, setInputCode] = useState<string>(initialCode);
   const [outputCode, setOutputCode] = useState<string>('');
   const [oneLinerDialogOpen, setOneLinerDialogOpen] = useState<boolean>(false);
+  const [stats, setStats] = useState<{ linesSaved: number; sizeSaved: number } | null>(null);
   const { toast } = useToast();
+
+  const formatBytes = (bytes: number, decimals = 2) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(Math.abs(bytes)) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  }
+
+  const calculateStats = (input: string, output: string) => {
+    if (!output && output !== '') {
+      setStats(null);
+      return;
+    }
+    const linesBefore = input.split('\n').length;
+    const linesAfter = output.split('\n').length;
+    const sizeBefore = new Blob([input]).size;
+    const sizeAfter = new Blob([output]).size;
+
+    setStats({
+        linesSaved: linesBefore - linesAfter,
+        sizeSaved: sizeBefore - sizeAfter,
+    });
+  };
 
   const handleCopy = () => {
     if (!outputCode) {
@@ -73,6 +99,7 @@ export function LuaEditor() {
     try {
       const result = lua.deleteAllComments(inputCode);
       setOutputCode(result);
+      calculateStats(inputCode, result);
       toast({ title: 'Comments deleted!', description: 'All comments have been removed.' });
     } catch (e) {
       const error = e instanceof Error ? e.message : 'An unknown error occurred';
@@ -84,6 +111,7 @@ export function LuaEditor() {
     try {
      const result = lua.toOneLiner(inputCode, commentOption);
      setOutputCode(result);
+     calculateStats(inputCode, result);
      toast({ title: 'Code converted to one line!', description: 'Multi-line code has been condensed.' });
    } catch (e) {
      const error = e instanceof Error ? e.message : 'An unknown error occurred';
@@ -95,6 +123,7 @@ export function LuaEditor() {
     try {
       const result = lua.reverseCode(inputCode);
       setOutputCode(result);
+      calculateStats(inputCode, result);
       toast({ title: 'Code reversed!', description: 'The input code has been reversed.' });
     } catch (e) {
       const error = e instanceof Error ? e.message : 'An unknown error occurred';
@@ -106,6 +135,7 @@ export function LuaEditor() {
     try {
       const result = lua.beautifyCode(inputCode);
       setOutputCode(result);
+      calculateStats(inputCode, result);
       toast({ title: 'Code beautified!', description: 'The code has been formatted.' });
     } catch (e) {
       const error = e instanceof Error ? e.message : 'An unknown error occurred';
@@ -116,6 +146,7 @@ export function LuaEditor() {
   const handleClear = () => {
     setInputCode('');
     setOutputCode('');
+    setStats(null);
     toast({ title: 'Cleared!', description: 'Input and output fields have been cleared.' });
   }
 
@@ -143,6 +174,12 @@ export function LuaEditor() {
                 placeholder={'Processed code will appear here...'}
                 className="font-code h-96 min-h-[300px] lg:h-[500px] bg-muted/30 text-base"
               />
+              {stats && (outputCode || outputCode === '') && (
+                <div className="mt-2 text-sm text-muted-foreground flex justify-end gap-4 pr-2">
+                  <span>Lines Saved: <span className="font-medium text-foreground">{stats.linesSaved}</span></span>
+                  <span>Size Saved: <span className="font-medium text-foreground">{formatBytes(stats.sizeSaved)}</span></span>
+                </div>
+              )}
             </div>
           </div>
           <div className="mt-6 flex flex-wrap gap-3 justify-center">
