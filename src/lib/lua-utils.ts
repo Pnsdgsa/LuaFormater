@@ -1,3 +1,4 @@
+
 /**
  * Removes all single-line and multi-line comments from Lua code.
  * @param code The input Lua code string.
@@ -77,8 +78,8 @@ export function beautifyCode(code: string): string {
       .replace(/;/g, ';\n')
       // Add newlines after block starters
       .replace(/\b(then|do)\b/g, '$1\n')
-      // Add newlines before block separators
-      .replace(/\b(else|elseif|end|until)\b/g, '\n$1')
+      // Add newlines before block separators. This now handles `end)` and `end))`.
+      .replace(/\b(else|elseif|end|until)(?![a-zA-Z0-9_])/g, '\n$1')
       // Clean up extra whitespace and newlines
       .replace(/\s*\n\s*/g, '\n')
       .trim();
