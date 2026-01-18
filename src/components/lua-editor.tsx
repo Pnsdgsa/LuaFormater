@@ -119,6 +119,14 @@ export function LuaEditor() {
    }
   };
 
+  const handleToOneLinerClick = () => {
+    if (lua.hasComments(inputCode)) {
+      setOneLinerDialogOpen(true);
+    } else {
+      handleToOneLiner('preserve');
+    }
+  };
+
   const handleReverse = () => {
     try {
       const result = lua.reverseCode(inputCode);
@@ -189,7 +197,7 @@ export function LuaEditor() {
             <Button variant="outline" onClick={handleDeleteComments}>
               <Trash2 className="mr-2 h-4 w-4" /> Delete Comments
             </Button>
-            <Button variant="outline" onClick={() => setOneLinerDialogOpen(true)}>
+            <Button variant="outline" onClick={handleToOneLinerClick}>
               <Sparkles className="mr-2 h-4 w-4" /> To One Liner
             </Button>
             <Button variant="outline" onClick={handleReverse}>

@@ -14,6 +14,20 @@ export function deleteAllComments(code: string): string {
 }
 
 /**
+ * Checks if the Lua code contains any comments.
+ * @param code The input Lua code string.
+ * @returns True if comments are found, false otherwise.
+ */
+export function hasComments(code: string): boolean {
+  // Regex for multi-line comments: --[[ ... ]] or --[=[ ... ]=]
+  const multiLineRegex = /--\[(=*)\[[\s\S]*?\]\1\]/;
+  // Regex for single-line comments that are not part of a multi-line comment start
+  const singleLineRegex = /--(?![\[=]*\[)/;
+  
+  return multiLineRegex.test(code) || singleLineRegex.test(code);
+}
+
+/**
  * Converts multi-line Lua code into a single line.
  * @param code The input Lua code.
  * @param commentOption Whether to 'preserve' or 'delete' comments.
