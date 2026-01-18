@@ -72,21 +72,33 @@ export function beautifyCode(code: string): string {
     // This is a very basic beautifier.
     let indentLevel = 0;
     const indentChar = '  ';
-    const lines = code.replace(/;/g, ';\n').replace(/\b(then|do)\b/g, '$1\n').replace(/\b(end|else|elseif|until)\b/g, '\n$1').split('\n');
+    // Add newlines to break up one-liners
+    const processedCode = code
+      .replace(/;/g, ';\n') // After semicolons
+      .replace(/\)\s*(?=[a-zA-Z_])/g, ')\n') // After a parenthesis ending a statement
+      .replace(/\b(then|do)\b/g, '$1\n') // After then/do
+      .replace(/\b(end|else|elseif|until)\b/g, '\n$1'); // Before end/else/elseif/until
+
+    const lines = processedCode.split('\n');
     let formatted = '';
     
     for (let line of lines) {
       line = line.trim();
+      if (!line) continue;
+
       if (line.match(/^(end|else|elseif|until)\b/)) {
         indentLevel = Math.max(0, indentLevel - 1);
       }
-      if (line !== '') {
-        formatted += indentChar.repeat(indentLevel) + line + '\n';
-      }
-      if (line.match(/\b(function|if|while|for|repeat|do)\b/)) {
-        // Avoid double indenting on one-line blocks
+      
+      formatted += indentChar.repeat(indentLevel) + line + '\n';
+      
+      if (line.match(/\b(function|if|while|for|repeat|do|then)\b/)) {
+        // Avoid double indenting on one-line blocks that contain 'end'
         if (!line.match(/\b(end)\b/)) {
-          indentLevel++;
+          // and don't re-indent for else/elseif
+           if (!line.match(/^(else|elseif)\b/)) {
+             indentLevel++;
+           }
         }
       }
     }
