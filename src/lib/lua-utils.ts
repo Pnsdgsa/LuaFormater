@@ -69,16 +69,16 @@ export function reverseCode(code: string): string {
 export function beautifyCode(code: string): string {
   let processedCode = code;
 
-  // If the code seems to be a one-liner, attempt to split it into multiple lines.
-  // This is a heuristic and may not perfectly format all edge cases, especially with keywords in strings.
+  // A simple heuristic to split one-liners into multiple lines for formatting.
+  // This is not a full parser and may not handle all cases perfectly.
   if (!code.trim().includes('\n')) {
     processedCode = code
       // Add newlines for statements separated by semicolons
       .replace(/;/g, ';\n')
       // Add newlines after block starters
       .replace(/\b(then|do)\b/g, '$1\n')
-      // Add newlines before keywords that start a new logical line
-      .replace(/\b(function|if|for|while|repeat|until|else|elseif|end|local)\b/g, '\n$1')
+      // Add newlines before block separators
+      .replace(/\b(else|elseif|end|until)\b/g, '\n$1')
       // Clean up extra whitespace and newlines
       .replace(/\s*\n\s*/g, '\n')
       .trim();
