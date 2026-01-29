@@ -282,7 +282,7 @@ export function LuaEditor() {
   const handleTouchStart = () => {
     longPressTimer.current = setTimeout(() => {
         setCustomDeleteOpen(true);
-    }, 800);
+    }, 3000);
   };
 
   const handleTouchEnd = () => {
@@ -311,7 +311,7 @@ export function LuaEditor() {
                     onContextMenu={handleContextMenu}
                     onTouchStart={handleTouchStart}
                     onTouchEnd={handleTouchEnd}
-                    onMouseMove={handleTouchEnd} 
+                    onTouchMove={handleTouchEnd} 
                     placeholder="Paste your Lua code here..."
                     className={cn(
                       "font-code h-96 min-h-[300px] lg:h-[500px] text-base border-primary/20 focus:border-primary",
