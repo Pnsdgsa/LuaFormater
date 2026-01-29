@@ -350,9 +350,33 @@ export function LuaEditor() {
             <Label htmlFor="wrap-lines">Wrap lines</Label>
           </div>
 
+          <div className="mt-6 flex flex-wrap gap-3 justify-center">
+            <Button variant="outline" onClick={handleBeautify}>
+              <Brush className="mr-2 h-4 w-4" /> Beautify
+            </Button>
+            <Button variant="outline" onClick={handleDeleteComments} disabled={!lua.hasComments(inputCode)}>
+              <Trash2 className="mr-2 h-4 w-4" /> Delete Comments
+            </Button>
+            <Button variant="outline" onClick={handleToOneLinerClick}>
+              <Sparkles className="mr-2 h-4 w-4" /> To One Liner
+            </Button>
+            <Button variant="outline" onClick={handleReverse}>
+              <ArrowLeftRight className="mr-2 h-4 w-4" /> Reverse
+            </Button>
+            <Button variant="secondary" onClick={handleCopy} disabled={!outputCode}>
+              <Copy className="mr-2 h-4 w-4" /> Copy
+            </Button>
+            <Button variant="secondary" onClick={handleDownload} disabled={!outputCode}>
+              <Download className="mr-2 h-4 w-4" /> Download
+            </Button>
+            <Button variant="destructive" onClick={handleClear}>
+              <Trash className="mr-2 h-4 w-4" /> Clear
+            </Button>
+          </div>
+
           <Accordion type="single" collapsible className="w-full mt-4 border rounded-lg">
             <AccordionItem value="advanced-delete">
-                <AccordionTrigger className="px-4 py-3">Advanced Comment Deletion</AccordionTrigger>
+                <AccordionTrigger className="px-4 py-3">Advanced Feature</AccordionTrigger>
                 <AccordionContent className="p-4 border-t">
                   <p className="text-sm text-muted-foreground mb-4">
                     Selectively remove comments based on patterns.
@@ -434,30 +458,6 @@ export function LuaEditor() {
                 </AccordionContent>
             </AccordionItem>
           </Accordion>
-
-          <div className="mt-6 flex flex-wrap gap-3 justify-center">
-            <Button variant="outline" onClick={handleBeautify}>
-              <Brush className="mr-2 h-4 w-4" /> Beautify
-            </Button>
-            <Button variant="outline" onClick={handleDeleteComments} disabled={!lua.hasComments(inputCode)}>
-              <Trash2 className="mr-2 h-4 w-4" /> Delete Comments
-            </Button>
-            <Button variant="outline" onClick={handleToOneLinerClick}>
-              <Sparkles className="mr-2 h-4 w-4" /> To One Liner
-            </Button>
-            <Button variant="outline" onClick={handleReverse}>
-              <ArrowLeftRight className="mr-2 h-4 w-4" /> Reverse
-            </Button>
-            <Button variant="secondary" onClick={handleCopy} disabled={!outputCode}>
-              <Copy className="mr-2 h-4 w-4" /> Copy
-            </Button>
-            <Button variant="secondary" onClick={handleDownload} disabled={!outputCode}>
-              <Download className="mr-2 h-4 w-4" /> Download
-            </Button>
-            <Button variant="destructive" onClick={handleClear}>
-              <Trash className="mr-2 h-4 w-4" /> Clear
-            </Button>
-          </div>
         </CardContent>
       </Card>
 
@@ -479,5 +479,3 @@ export function LuaEditor() {
     </>
   );
 }
-
-    
