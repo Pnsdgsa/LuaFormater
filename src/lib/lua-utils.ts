@@ -59,6 +59,61 @@ export function deleteAllComments(code: string): string {
   return restoreStrings(codeWithCleanedLines, strings);
 }
 
+// Helper to escape regex special characters
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
+/**
+ * Deletes comments from Lua code based on a set of options.
+ * @param code The input Lua code.
+ * @param options An object specifying which comments to delete.
+ * @returns Code with specified comments removed.
+ */
+export function deleteCustomComments(
+  code: string, 
+  options: {
+    singleLine: boolean;
+    multiLine: boolean;
+    customSingle: string;
+    customMultiStart: string;
+    customMultiEnd: string;
+  }
+): string {
+  const { protectedCode, strings } = protectStrings(code);
+  let processedCode = protectedCode;
+
+  // Standard single-line comments
+  if (options.singleLine) {
+    processedCode = processedCode.replace(/--[^\n]*/g, '');
+  }
+  // Standard multi-line comments
+  if (options.multiLine) {
+    processedCode = processedCode
+      .replace(/--\[\[[\s\S]*?\]\]/g, '')
+      .replace(/--\[=\[[\s\S]*?\]=\]/g, '');
+  }
+
+  // Custom single-line comments
+  if (options.customSingle) {
+    const customSinglePrefix = escapeRegExp(options.customSingle);
+    const regex = new RegExp(`${customSinglePrefix}[^\\n]*`, 'g');
+    processedCode = processedCode.replace(regex, '');
+  }
+
+  // Custom multi-line comments
+  if (options.customMultiStart && options.customMultiEnd) {
+    const customStart = escapeRegExp(options.customMultiStart);
+    const customEnd = escapeRegExp(options.customMultiEnd);
+    const regex = new RegExp(`${customStart}[\\s\\S]*?${customEnd}`, 'g');
+    processedCode = processedCode.replace(regex, '');
+  }
+  
+  const codeWithCleanedLines = processedCode.replace(/\n\s*\n/g, '\n').trim();
+
+  return restoreStrings(codeWithCleanedLines, strings);
+}
+
 /**
  * Converts multi-line Lua code into a single line, safely handling strings.
  * @param code The input Lua code.
@@ -96,13 +151,13 @@ export function reverseCode(code: string): string {
 export function beautifyCode(code: string): string {
     const { protectedCode: initialProtectedCode, strings } = protectStrings(code);
 
-    // Split one-liners on the protected code, so strings aren't affected
+    // Add newlines after parentheses only if they are followed by a word character (likely a new statement)
     let processedCode = initialProtectedCode
-        .replace(/\)\s*([a-zA-Z_])/g, ')\n$1') // Add newline after a parenthesis if it's followed by a letter/underscore (likely a new statement)
+        .replace(/\)\s*(\w)/g, ')\n$1') 
         .replace(/\b(then)\b/g, 'then\n')
         .replace(/\b(else)\b/g, '\nelse\n')
         .replace(/\b(elseif)\b/g, '\nelseif ')
-        .replace(/(\bend\b)/g, '\n$1')
+        .replace(/(\bend\b|end\))/g, '\n$1') // handle "end" and "end)"
         .replace(/;\s*/g, ';\n');
 
 
@@ -122,7 +177,7 @@ export function beautifyCode(code: string): string {
 
         const firstWord = trimmedLine.split(/\s+|(?=[^\w\s])/)[0];
         
-        if (decreaseIndentKeywords.includes(firstWord) || midBlockKeywords.includes(firstWord)) {
+        if (decreaseIndentKeywords.includes(firstWord) || midBlockKeywords.includes(firstWord) || trimmedLine.startsWith('end)')) {
             indentLevel = Math.max(0, indentLevel - 1);
         }
 
