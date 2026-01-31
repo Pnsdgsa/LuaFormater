@@ -122,15 +122,49 @@ export function deleteCustomComments(
  */
 export function toOneLiner(code: string, commentOption: 'preserve' | 'delete'): string {
   let processedCode = code;
-  if (commentOption === 'delete') {
-    processedCode = deleteAllComments(processedCode); // This is now safe
+
+  // If preserving comments, we need to convert single-line comments to block comments
+  // to prevent them from consuming the rest of the one-liner.
+  if (commentOption === 'preserve') {
+    const { protectedCode, strings } = protectStrings(code);
+    
+    const lines = protectedCode.split('\n');
+    const newLines = lines.map(line => {
+      const commentIndex = line.indexOf('--');
+      
+      // Check if it's a true single-line comment (and not a block comment starter)
+      if (commentIndex !== -1 && !line.substring(commentIndex).startsWith('--[')) {
+        const codePart = line.substring(0, commentIndex);
+        const commentPart = line.substring(commentIndex + 2);
+
+        // If the original comment text contains the block comment terminator,
+        // this simple wrapping will break. As a safe fallback, we'll just remove
+        // such problematic comments instead of trying complex wrapping.
+        if (commentPart.includes(']]')) {
+          return codePart;
+        }
+
+        // Wrap the single-line comment into a block comment.
+        return codePart + ' --[[' + commentPart + ']]';
+      }
+      return line;
+    });
+    // Join lines with a space, now that single-line comments are safely wrapped.
+    processedCode = restoreStrings(newLines.join(' '), strings);
+  } else {
+    // If deleting comments, just use the existing safe function.
+    processedCode = deleteAllComments(processedCode);
   }
 
-  const { protectedCode, strings } = protectStrings(processedCode);
-  
-  const oneLiner = protectedCode.replace(/\s*\n\s*/g, ' ').replace(/ +/g, ' ').trim();
+  // Final step: collapse all newlines and extra spaces from the processed code.
+  // This handles both the 'preserve' and 'delete' paths.
+  const { protectedCode: finalProtectedCode, strings: finalStrings } = protectStrings(processedCode);
+  const oneLiner = finalProtectedCode
+    .replace(/\s*\n\s*/g, ' ') // Replace any remaining newlines with spaces
+    .replace(/ +/g, ' ')       // Collapse multiple spaces into one
+    .trim();
 
-  return restoreStrings(oneLiner, strings);
+  return restoreStrings(oneLiner, finalStrings);
 }
 
 /**
