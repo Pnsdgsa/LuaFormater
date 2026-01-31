@@ -414,9 +414,6 @@ export function LuaEditor() {
             <Button variant="outline" onClick={handleReverse}>
               <ArrowLeftRight className="mr-2 h-4 w-4" /> Reverse
             </Button>
-             <Button variant="outline" onClick={() => setAdvancedToolsDialogOpen(true)}>
-              <Settings className="mr-2 h-4 w-4" /> Advanced Tools
-            </Button>
             <Button variant="secondary" onClick={handleCopy} disabled={!outputCode}>
               <Copy className="mr-2 h-4 w-4" /> Copy
             </Button>
@@ -436,6 +433,20 @@ export function LuaEditor() {
         </CardContent>
       </Card>
       
+      <Card className="mt-4 w-full shadow-lg">
+        <CardHeader>
+          <CardTitle>Advanced Feature</CardTitle>
+          <CardDescription>
+            Advanced options for comment inspection and deletion.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+            <Button variant="outline" onClick={() => setAdvancedToolsDialogOpen(true)}>
+              <Settings className="mr-2 h-4 w-4" /> Open Advanced Tools
+            </Button>
+        </CardContent>
+      </Card>
+
       <AlertDialog open={oneLinerDialogOpen} onOpenChange={setOneLinerDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
