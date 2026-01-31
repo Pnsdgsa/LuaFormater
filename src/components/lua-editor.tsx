@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeftRight, Copy, Download, Trash2, Sparkles, Brush, Trash, Upload, ClipboardPaste, Cog } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeftRight, Copy, Download, Trash2, Sparkles, Brush, Trash, Upload, ClipboardPaste } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -46,7 +46,6 @@ export function LuaEditor() {
   const [inputCode, setInputCode] = useState<string>(initialCode);
   const [outputCode, setOutputCode] = useState<string>('');
   const [oneLinerDialogOpen, setOneLinerDialogOpen] = useState<boolean>(false);
-  const [advancedDialogOpen, setAdvancedDialogOpen] = useState<boolean>(false);
   const [deleteOptions, setDeleteOptions] = useState({
     singleLine: true,
     multiLine: true,
@@ -352,9 +351,6 @@ export function LuaEditor() {
             <Button variant="outline" onClick={handleDeleteComments} disabled={!lua.hasComments(inputCode)}>
               <Trash2 className="mr-2 h-4 w-4" /> Delete Comments
             </Button>
-            <Button variant="outline" onClick={() => setAdvancedDialogOpen(true)}>
-              <Cog className="mr-2 h-4 w-4" /> Advanced Delete
-            </Button>
             <Button variant="outline" onClick={handleToOneLinerClick}>
               <Sparkles className="mr-2 h-4 w-4" /> To One Liner
             </Button>
@@ -374,14 +370,14 @@ export function LuaEditor() {
         </CardContent>
       </Card>
 
-      <AlertDialog open={advancedDialogOpen} onOpenChange={setAdvancedDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Advanced Comment Deletion</AlertDialogTitle>
-            <AlertDialogDescription>
-              Selectively remove comments based on patterns.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
+      <Card className="mt-6 w-full shadow-lg">
+        <CardHeader>
+          <CardTitle>Advanced Feature</CardTitle>
+          <CardDescription>
+            Selectively remove comments based on patterns.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
           <Tabs defaultValue="standard" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="standard">Standard Comments</TabsTrigger>
@@ -453,12 +449,13 @@ export function LuaEditor() {
                 </Card>
             </TabsContent>
           </Tabs>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleCustomDelete}>Apply & Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          <div className="mt-4 flex justify-end">
+            <Button onClick={handleCustomDelete}>
+              <Trash2 className="mr-2 h-4 w-4" /> Apply Custom Delete
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <AlertDialog open={oneLinerDialogOpen} onOpenChange={setOneLinerDialogOpen}>
         <AlertDialogContent>
