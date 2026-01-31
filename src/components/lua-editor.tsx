@@ -472,7 +472,19 @@ export function LuaEditor() {
       <Dialog open={advancedToolsDialogOpen} onOpenChange={setAdvancedToolsDialogOpen}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Advanced Tools</DialogTitle>
+            <div className="flex justify-between items-center">
+              <DialogTitle>Advanced Tools</DialogTitle>
+              <div className="flex gap-2">
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={handleUndo} disabled={historyIndex === 0}>
+                    <Undo className="h-4 w-4" />
+                    <span className="sr-only">Undo</span>
+                </Button>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={handleRedo} disabled={historyIndex >= history.length - 1}>
+                    <Redo className="h-4 w-4" />
+                    <span className="sr-only">Redo</span>
+                </Button>
+              </div>
+            </div>
             <DialogDescription>
               Inspect or selectively remove comments from your code.
             </DialogDescription>
