@@ -333,16 +333,28 @@ export function LuaEditor() {
                   <TabsTrigger value="clipboard">Clipboard</TabsTrigger>
                 </TabsList>
                 <TabsContent value="editor">
-                  <Textarea
-                    id="input-code"
-                    value={inputCode}
-                    onChange={(e) => updateInputCode(e.target.value)}
-                    placeholder="Paste your Lua code here..."
-                    className={cn(
-                      "font-code h-96 min-h-[300px] lg:h-[500px] text-base border-primary/20 focus:border-primary",
-                      !wrapLines && "whitespace-pre overflow-x-auto"
-                    )}
-                  />
+                  <div className="relative">
+                    <div className="absolute top-2 right-2 z-10 flex gap-2">
+                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={handleUndo} disabled={historyIndex === 0}>
+                        <Undo className="h-4 w-4" />
+                        <span className="sr-only">Undo</span>
+                      </Button>
+                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={handleRedo} disabled={historyIndex >= history.length - 1}>
+                        <Redo className="h-4 w-4" />
+                        <span className="sr-only">Redo</span>
+                      </Button>
+                    </div>
+                    <Textarea
+                      id="input-code"
+                      value={inputCode}
+                      onChange={(e) => updateInputCode(e.target.value)}
+                      placeholder="Paste your Lua code here..."
+                      className={cn(
+                        "font-code h-96 min-h-[300px] lg:h-[500px] text-base border-primary/20 focus:border-primary",
+                        !wrapLines && "whitespace-pre overflow-x-auto"
+                      )}
+                    />
+                  </div>
                 </TabsContent>
                 <TabsContent value="upload">
                   <div className="relative flex flex-col items-center justify-center rounded-md border border-dashed h-96 min-h-[300px] lg:h-[500px] text-center p-4">
@@ -419,12 +431,6 @@ export function LuaEditor() {
             </Button>
             <Button variant="secondary" onClick={handleDownload} disabled={!outputCode}>
               <Download className="mr-2 h-4 w-4" /> Download
-            </Button>
-            <Button variant="outline" onClick={handleUndo} disabled={historyIndex === 0}>
-                <Undo className="mr-2 h-4 w-4" /> Undo
-            </Button>
-            <Button variant="outline" onClick={handleRedo} disabled={historyIndex >= history.length - 1}>
-                <Redo className="mr-2 h-4 w-4" /> Redo
             </Button>
             <Button variant="destructive" onClick={handleClear}>
               <Trash className="mr-2 h-4 w-4" /> Clear
@@ -593,5 +599,3 @@ export function LuaEditor() {
     </>
   );
 }
-
-    
